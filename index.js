@@ -61,6 +61,8 @@ const getDataFromWebPage = async () => {
   await browser.close()
 }
 
+const MAX_PAGES = 5
+
 const handleDynamicWebPage = async () => {
   try {
     const browser = await puppeteer.launch({
@@ -73,26 +75,35 @@ const handleDynamicWebPage = async () => {
     await page.setUserAgent(userAgent);
     await page.setViewport({ width: 1920, height: 1080})
 
-    await page.goto('http://quotes.toscrape.com/')
+    const pages = ['http://quotes.toscrape.com/page/8/', 'http://quotes.toscrape.com/page/9/']
+    const dataa = []
 
-    const result = await page.evaluate(() => {
-      const quotes = document.querySelectorAll('.quote')
-      const data = [...quotes].map((quote, index) => {
-        const quoteText = quote.querySelector('.text').innerText
-        const author = quote.querySelector('.author').innerText
-        const tags = [...quote.querySelectorAll('.tag')].map(tag => tag.innerText)
+    for (const url of pages) {
+      await page.goto(url)
 
-        return { id: index, quoteText, author, tags }
+      const result = await page.evaluate(() => {
+        const quotes = document.querySelectorAll('.quote')
+        const data = [...quotes].map((quote, index) => {
+          const quoteText = quote.querySelector('.text').innerText
+          const author = quote.querySelector('.author').innerText
+          const tags = [...quote.querySelectorAll('.tag')].map(tag => tag.innerText)
+  
+          return { id: index, quoteText, author, tags }
+        })
+  
+        return data
       })
+  
+      const getUrlNextPage = await page.$('.next a')
+      const nextUrl = await page.evaluate(getUrlNextPage => getUrlNextPage.getAttribute('href'), getUrlNextPage)
 
-      return data
-    })
+      dataa.push(result)
+    }
 
-    await page.screenshot({ path: './data/screens/example.png'})
+    console.log(dataa)
+    
+    //await page.screenshot({ path: './data/screens/example.png'})
     await browser.close()
-
-    await writeJson(result)
-    await writeExcel(result)
   } catch (err) {
     console.log(err)
   }
