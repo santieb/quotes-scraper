@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer'
-import fs from 'fs/promises'
+import { writeExcel, writeJson } from './utils/index.js'
 import randomUseragent from 'random-useragent'
 
 const openWebPage = async () => {
@@ -65,11 +65,10 @@ const handleDynamicWebPage = async () => {
   try {
     const browser = await puppeteer.launch({
       headless: false,
-      slowMo: 200,
+      slowMo: 100,
     })
 
     const page = await browser.newPage()
-  
     const userAgent = randomUseragent.getRandom();
     await page.setUserAgent(userAgent);
     await page.setViewport({ width: 1920, height: 1080})
@@ -78,12 +77,12 @@ const handleDynamicWebPage = async () => {
 
     const result = await page.evaluate(() => {
       const quotes = document.querySelectorAll('.quote')
-      const data = [...quotes].map(quote => {
+      const data = [...quotes].map((quote, index) => {
         const quoteText = quote.querySelector('.text').innerText
         const author = quote.querySelector('.author').innerText
         const tags = [...quote.querySelectorAll('.tag')].map(tag => tag.innerText)
 
-        return { quoteText, author, tags }
+        return { id: index, quoteText, author, tags }
       })
 
       return data
@@ -91,7 +90,9 @@ const handleDynamicWebPage = async () => {
 
     await page.screenshot({ path: './data/screens/example.png'})
     await browser.close()
-    await fs.writeFile('./data/data.json', JSON.stringify(result, null, 2));
+
+    await writeJson(result)
+    await writeExcel(result)
   } catch (err) {
     console.log(err)
   }

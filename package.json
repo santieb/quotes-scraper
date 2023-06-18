@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "exceljs": "^4.3.0",
     "puppeteer": "^20.7.2",
     "random-useragent": "^0.5.0"
   }
