@@ -1,1 +1,3 @@
-# scraper-node
+# Learning Web scraping
+
+- Puppeteer
