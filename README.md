@@ -1,4 +1,4 @@
-# Learning Web scraping
+# Quotes-scrapper
 
 Quotes-scrapper is a web scrapper that can be used to get quotes from https://quotes.toscrape.com/ and generate files with that data
 
