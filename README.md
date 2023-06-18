@@ -22,7 +22,7 @@ Execute script
 npm run start
 ```
 
-## Construido con 🛠️
+## Developed with 🛠️
 - Nodejs
 - Puppeteer
 - Random-useragent
